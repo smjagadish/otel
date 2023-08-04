@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import io.opentelemetry.api.trace.Span;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,7 +44,8 @@ public class StudentServiceController {
   public List<Student> getStudents(@PathVariable String schoolname) {
     Span span = Span.current();
     span.setAttribute("schoolname",schoolname);
-    System.out.println("Getting Student details for " + schoolname);
+    //System.out.println("Getting Student details for " + schoolname);
+    LoggerFactory.getLogger(StudentServiceController.class).info("Getting Student details for" + schoolname);
  
     List<Student> studentList = schooDB.get(schoolname);
     if (studentList == null) {

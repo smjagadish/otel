@@ -4,11 +4,14 @@
         <pattern><![CDATA[%date{HH:mm:ss.SSS} [%thread] %-5level %logger{15}#%line %X{req.requestURI} traceId: %X{trace_id} spanId: %X{span_id} %msg\n]]></pattern>
     </encoder>
     </appender>
+
     <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.v1_0.OpenTelemetryAppender">
-        <appender-ref ref="STDOUT" />
+
     </appender>
     <root>
         <level value="INFO" />
         <appender-ref ref="STDOUT" />
+
+
     </root>
 </configuration>
