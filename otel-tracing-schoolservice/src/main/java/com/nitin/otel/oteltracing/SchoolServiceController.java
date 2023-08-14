@@ -9,14 +9,9 @@ import io.opentelemetry.context.propagation.TextMapSetter;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.*;
@@ -31,7 +26,7 @@ public class SchoolServiceController {
     @Async
     // controller task runs as async and is run using the default thread pool on a different thread (i.e. not same thread as where the dispatcher servlet was called)
     // puts a constraint on the return types to be either void or Future type
-    public CompletableFuture<String> getStudents(@PathVariable String schoolname) throws InterruptedException {
+    public CompletableFuture<ResponseEntity<String>> getStudents(@PathVariable String schoolname) throws Exception {
         // creating my own span
         Span span = null;
         Tracer tracer = GlobalOpenTelemetry.getTracer("my tracer");
@@ -77,6 +72,7 @@ public class SchoolServiceController {
             // Http header inclusion
             HttpEntity<String> entity = new HttpEntity<>(headers);
             restTemplate.exchange("http://localhost:9001/health", HttpMethod.GET, entity, new ParameterizedTypeReference<String>() {
+
             });
 
             // Jul 21 , 2023
@@ -84,7 +80,7 @@ public class SchoolServiceController {
             // the parent span must be same for these invocations and i expect to see 5 + 5 spans overall , i.e. for the http client lib and the servlet handler
             ExecutorService exec = Executors.newFixedThreadPool(5);
             for (int i = 0; i < 5; i++) {
-                exec.submit(new Callable<String>() {
+                Future<String> cf = exec.submit(new Callable<String>() {
 
                     @Override
                     public String call() throws Exception {
@@ -121,9 +117,10 @@ public class SchoolServiceController {
         System.out.println("Response Received as " + response);
 
         // allowing threads to run to completion , so i purposefully delay main thread
-
-
-        return CompletableFuture.completedFuture("School Name -  " + schoolname + " \n Student Details " + response);
+        // Aug 11 , 2023 - Updated to use a response entity based return stmt
+        // keep improving this to embark spring learning in ||
+        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(response));
+        //return CompletableFuture.completedFuture("School Name -  " + schoolname + " \n Student Details " + response);
 
 
     }
@@ -149,6 +146,13 @@ public class SchoolServiceController {
         for (int i = 0; i < 100000; i++) {
 
         }
+    }
+
+    // Aug 11 , 2023 - Part of my exploration with spring rest controller
+    // HTTP status control through the response status annotation
+    @GetMapping("empty")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void emptyResponseWithoutResponseStatus() {
     }
 
 }
