@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>io.opentelemetry.instrumentation</groupId>
 			<artifactId>opentelemetry-instrumentation-annotations</artifactId>
-			<version>1.27.0</version>
+			<version>1.33.6</version>
 		</dependency>
 	</dependencies>
 
