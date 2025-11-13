@@ -8,6 +8,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Scheduled health check component for monitoring the school service availability.
+ * This component performs periodic health checks to ensure the school service is running
+ * and generates distributed tracing data for OpenTelemetry monitoring.
+ */
 @Component
 public class MockHealthEndpointScheduler {
 
@@ -17,6 +22,13 @@ public class MockHealthEndpointScheduler {
     @Autowired
     RestTemplate restTemplate;
 
+    /**
+     * Performs a health check every 10 seconds (HEALTH_CHECK_INTERVAL_MS).
+     * This method calls the school service health endpoint to verify service availability
+     * and generates trace spans for distributed tracing analysis.
+     * 
+     * @throws RuntimeException if the health check fails
+     */
     @Scheduled(fixedRate = HEALTH_CHECK_INTERVAL_MS)
     public void fixedRateSch() {
         log.debug("Starting health check at {}", System.currentTimeMillis());

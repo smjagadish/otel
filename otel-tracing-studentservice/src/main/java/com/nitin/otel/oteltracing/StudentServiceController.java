@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
- 
+/**
+ * REST controller for student service operations.
+ * Provides endpoints to retrieve student information by school and health checks.
+ * Includes OpenTelemetry tracing for distributed monitoring.
+ */
 @RestController
 public class StudentServiceController {
  
@@ -40,6 +44,11 @@ public class StudentServiceController {
  
   }
  
+  /**
+   * Retrieves student details for a specific school.
+   * @param schoolname the name of the school
+   * @return list of students for the specified school
+   */
   @RequestMapping(value = "/getStudentDetailsForSchool/{schoolname}", method = RequestMethod.GET)
   public List<Student> getStudents(@PathVariable String schoolname) {
     Span span = Span.current();
@@ -55,6 +64,10 @@ public class StudentServiceController {
     }
     return studentList;
   }
+  /**
+   * Health check endpoint for service monitoring.
+   * @return health status message
+   */
   @RequestMapping(value = "/health", method = RequestMethod.GET)
   public String getHealth()   {
     return "School Service is Healthy";

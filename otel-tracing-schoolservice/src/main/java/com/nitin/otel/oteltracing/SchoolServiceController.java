@@ -22,10 +22,16 @@ public class SchoolServiceController {
     @Autowired
     RestTemplate restTemplate;
 
+    /**
+     * Retrieves school details asynchronously with OpenTelemetry tracing.
+     * Controller task runs async using default thread pool on a different thread.
+     * Demonstrates baggage propagation, manual span creation, and distributed tracing.
+     * @param schoolname the name of the school
+     * @return CompletableFuture containing school details response
+     * @throws Exception if processing fails
+     */
     @RequestMapping(value = "/getSchoolDetails/{schoolname}", method = RequestMethod.GET)
     @Async
-    // controller task runs as async and is run using the default thread pool on a different thread (i.e. not same thread as where the dispatcher servlet was called)
-    // puts a constraint on the return types to be either void or Future type
     public CompletableFuture<ResponseEntity<String>> getStudents(@PathVariable String schoolname) throws Exception {
         // creating my own span
         Span span = null;
@@ -125,11 +131,19 @@ public class SchoolServiceController {
 
     }
 
+    /**
+     * Health check endpoint for service monitoring.
+     * @return health status message
+     */
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public String getHealth() {
         return "School Service is Healthy";
     }
 
+    /**
+     * Dummy method for testing span attribute injection.
+     * Adds custom attributes to the current OpenTelemetry span.
+     */
     public void dummy() {
         System.out.print("called for fun");
         Span span = Span.current();
@@ -137,19 +151,23 @@ public class SchoolServiceController {
         span.setAttribute("dummymeth", "kklkljlk");
     }
 
-    //Jul11 2023
-    // annotation based manual spanning
+    /**
+     * Demonstrates annotation-based manual spanning with OpenTelemetry.
+     * Runs asynchronously from a thread in the default thread pool.
+     * Creates a custom span using @WithSpan annotation.
+     */
     @WithSpan
     @Async
-    // this method runs as async from a thread in the default thread pool
     public void manual_span() {
         for (int i = 0; i < 100000; i++) {
 
         }
     }
 
-    // Aug 11 , 2023 - Part of my exploration with spring rest controller
-    // HTTP status control through the response status annotation
+    /**
+     * Empty endpoint demonstrating HTTP status control through ResponseStatus annotation.
+     * Returns HTTP 201 CREATED status without response body.
+     */
     @GetMapping("empty")
     @ResponseStatus(HttpStatus.CREATED)
     public void emptyResponseWithoutResponseStatus() {
