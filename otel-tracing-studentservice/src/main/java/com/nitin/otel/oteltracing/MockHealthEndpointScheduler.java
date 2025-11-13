@@ -12,11 +12,12 @@ import org.springframework.web.client.RestTemplate;
 public class MockHealthEndpointScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(MockHealthEndpointScheduler.class);
+    private static final int HEALTH_CHECK_INTERVAL_MS = 10000;
 
     @Autowired
     RestTemplate restTemplate;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = HEALTH_CHECK_INTERVAL_MS)
     public void fixedRateSch() {
         log.debug("Starting health check at {}", System.currentTimeMillis());
         
@@ -25,6 +26,7 @@ public class MockHealthEndpointScheduler {
             log.debug("Health check response - Status: {}, Body: {}", response.getStatusCode(), response.getBody());
         } catch (Exception e) {
             log.error("Health check failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Health check failed", e);
         }
     }
 }
